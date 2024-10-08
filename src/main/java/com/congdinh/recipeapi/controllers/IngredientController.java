@@ -12,10 +12,14 @@ import com.congdinh.recipeapi.dto.ingredient.IngredientCreateDTO;
 import com.congdinh.recipeapi.dto.ingredient.IngredientDTO;
 import com.congdinh.recipeapi.services.IngredientService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/ingredients")
+@Tag(name = "ingredients", description = "The Ingredient API")
 public class IngredientController {
     private final IngredientService ingredientService;
     private final PagedResourcesAssembler<IngredientDTO> pagedResourcesAssembler;
@@ -29,6 +33,8 @@ public class IngredientController {
     // Get all - GetMapping - /api/v1/ingredients
     // Search - GetMapping - /api/v1/ingredients?keyword=...&page=...&size=...
     @GetMapping
+    @Operation(summary = "Get all ingredients or search ingredients by keyword")
+    @ApiResponse(responseCode = "200", description = "Return all ingredients or search ingredients by keyword")
     public ResponseEntity<?> search(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false, defaultValue = "name") String sortBy, // Xac dinh truong sap xep
@@ -56,6 +62,9 @@ public class IngredientController {
 
     // Get by id - GetMapping - /api/v1/ingredients/{id}
     @GetMapping("/{id}")
+    @Operation(summary = "Get ingredient by id")
+    @ApiResponse(responseCode = "200", description = "Return ingredient by id")
+    @ApiResponse(responseCode = "404", description = "Ingredient not found")
     public ResponseEntity<?> findById(@PathVariable UUID id) {
         var ingredient = ingredientService.findById(id);
         // Check if ingredient is null => return 404 Not Found
@@ -69,6 +78,9 @@ public class IngredientController {
 
     // Create - PostMapping - /api/v1/ingredients
     @PostMapping
+    @Operation(summary = "Create new ingredient")
+    @ApiResponse(responseCode = "201", description = "Create new ingredient")
+    @ApiResponse(responseCode = "400", description = "Bad Request")
     public ResponseEntity<?> create(@Valid @RequestBody IngredientCreateDTO ingredientCreateDTO,
             BindingResult bindingResult) {
         // Validate ingredientCreateDTO
@@ -89,6 +101,9 @@ public class IngredientController {
 
     // Update - PutMapping - /api/v1/ingredients/{id}
     @PutMapping("/{id}")
+    @Operation(summary = "Update ingredient by id")
+    @ApiResponse(responseCode = "200", description = "Update ingredient by id")
+    @ApiResponse(responseCode = "400", description = "Bad Request")
     public ResponseEntity<?> edit(
             @PathVariable UUID id,
             @Valid @RequestBody IngredientDTO ingredientDTO,
@@ -112,6 +127,9 @@ public class IngredientController {
 
     // Delete - DeleteMapping - /api/v1/ingredients/{id}
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete ingredient by id")
+    @ApiResponse(responseCode = "200", description = "Delete ingredient by id")
+    @ApiResponse(responseCode = "404", description = "Ingredient not found")
     public ResponseEntity<?> deleteById(@PathVariable UUID id) {
         var existedIngredient = ingredientService.findById(id);
         // Check if ingredient is null => return 404 Not Found

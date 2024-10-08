@@ -12,10 +12,14 @@ import com.congdinh.recipeapi.dto.category.CategoryCreateDTO;
 import com.congdinh.recipeapi.dto.category.CategoryDTO;
 import com.congdinh.recipeapi.services.CategoryService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/categories")
+@Tag(name = "categories", description = "The Category API")
 public class CategoryController {
     private final CategoryService categoryService;
     private final PagedResourcesAssembler<CategoryDTO> pagedResourcesAssembler;
@@ -29,6 +33,8 @@ public class CategoryController {
     // Get all - GetMapping - /api/v1/categories
     // Search - GetMapping - /api/v1/categories?keyword=...&page=...&size=...
     @GetMapping
+    @Operation(summary = "Get all categories or search categories by keyword")
+    @ApiResponse(responseCode = "200", description = "Return all categories or search categories by keyword")
     public ResponseEntity<?> search(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false, defaultValue = "name") String sortBy, // Xac dinh truong sap xep
@@ -56,6 +62,9 @@ public class CategoryController {
 
     // Get by id - GetMapping - /api/v1/categories/{id}
     @GetMapping("/{id}")
+    @Operation(summary = "Get category by id")
+    @ApiResponse(responseCode = "200", description = "Return category by id")
+    @ApiResponse(responseCode = "404", description = "Category not found")
     public ResponseEntity<?> findById(@PathVariable UUID id) {
         var category = categoryService.findById(id);
         // Check if category is null => return 404 Not Found
@@ -69,6 +78,9 @@ public class CategoryController {
 
     // Create - PostMapping - /api/v1/categories
     @PostMapping
+    @Operation(summary = "Create new category")
+    @ApiResponse(responseCode = "201", description = "Create new category")
+    @ApiResponse(responseCode = "400", description = "Bad Request")
     public ResponseEntity<?> create(@Valid @RequestBody CategoryCreateDTO categoryCreateDTO,
             BindingResult bindingResult) {
         // Validate categoryCreateDTO
@@ -89,6 +101,9 @@ public class CategoryController {
 
     // Update - PutMapping - /api/v1/categories/{id}
     @PutMapping("/{id}")
+    @Operation(summary = "Update category by id")
+    @ApiResponse(responseCode = "200", description = "Update category by id")
+    @ApiResponse(responseCode = "400", description = "Bad Request")
     public ResponseEntity<?> edit(
             @PathVariable UUID id,
             @Valid @RequestBody CategoryDTO categoryDTO,
@@ -112,6 +127,9 @@ public class CategoryController {
 
     // Delete - DeleteMapping - /api/v1/categories/{id}
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete category by id")
+    @ApiResponse(responseCode = "200", description = "Delete category by id")
+    @ApiResponse(responseCode = "404", description = "Category not found")
     public ResponseEntity<?> deleteById(@PathVariable UUID id) {
         var existedCategory = categoryService.findById(id);
         // Check if category is null => return 404 Not Found
