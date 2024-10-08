@@ -31,6 +31,12 @@
 		<java.version>22</java.version>
 	</properties>
 	<dependencies>
+		<!-- Spring Boot HATEOAS -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-hateoas</artifactId>
+		</dependency>
+		
 		<!-- Spring Boot Starter JPA -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
