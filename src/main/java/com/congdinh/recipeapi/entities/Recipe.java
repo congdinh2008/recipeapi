@@ -1,6 +1,6 @@
 package com.congdinh.recipeapi.entities;
 
-import java.util.UUID;
+import java.util.*;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -37,4 +37,7 @@ public class Recipe {
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Category category;
+
+    @OneToMany(mappedBy = "recipe")
+    private Set<RecipeIngredient> ingredients;
 }

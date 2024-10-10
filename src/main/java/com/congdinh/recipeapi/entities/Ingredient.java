@@ -1,6 +1,6 @@
 package com.congdinh.recipeapi.entities;
 
-import java.util.UUID;
+import java.util.*;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,4 +18,7 @@ public class Ingredient {
 
     @Column(name = "name", unique = true, nullable = false, columnDefinition = "NVARCHAR(255)")
     private String name;
+
+    @OneToMany(mappedBy = "ingredient")
+    private Set<RecipeIngredient> recipes;
 }
