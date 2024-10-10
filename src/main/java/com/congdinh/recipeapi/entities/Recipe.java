@@ -33,4 +33,8 @@ public class Recipe {
     
     @Column(name = "servings", nullable = false, columnDefinition = "INT CHECK (servings >= 0) DEFAULT 0")
     private Integer servings; // number of servings
+
+    @ManyToOne
+    @JoinColumn(name = "category_id", referencedColumnName = "id")
+    private Category category;
 }

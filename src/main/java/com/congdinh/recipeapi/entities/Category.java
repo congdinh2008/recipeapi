@@ -1,6 +1,6 @@
 package com.congdinh.recipeapi.entities;
 
-import java.util.UUID;
+import java.util.*;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,4 +21,7 @@ public class Category {
 
     @Column(name = "description", columnDefinition = "NVARCHAR(500)")
     private String description;
+
+    @OneToMany(mappedBy = "category")
+    private List<Recipe> recipes;
 }

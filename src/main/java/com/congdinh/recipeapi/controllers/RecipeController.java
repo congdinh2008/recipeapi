@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.congdinh.recipeapi.dto.recipe.RecipeCreateDTO;
 import com.congdinh.recipeapi.dto.recipe.RecipeDTO;
+import com.congdinh.recipeapi.dto.recipe.RecipeEditDTO;
 import com.congdinh.recipeapi.services.RecipeService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -106,14 +107,14 @@ public class RecipeController {
     @ApiResponse(responseCode = "400", description = "Bad Request")
     public ResponseEntity<?> edit(
             @PathVariable UUID id,
-            @Valid @RequestBody RecipeDTO recipeDTO,
+            @Valid @RequestBody RecipeEditDTO recipeEditDTO,
             BindingResult bindingResult) {
         // Validate recipeDTO
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
 
-        var updatedRecipeDTO = recipeService.update(id, recipeDTO);
+        var updatedRecipeDTO = recipeService.update(id, recipeEditDTO);
 
         // Check if updatedRecipe is null => return 400 Bad Request
         if (updatedRecipeDTO == null) {

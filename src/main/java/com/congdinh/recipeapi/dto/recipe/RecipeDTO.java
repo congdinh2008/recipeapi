@@ -4,6 +4,8 @@ import java.util.UUID;
 
 import org.hibernate.validator.constraints.Length;
 
+import com.congdinh.recipeapi.dto.category.CategoryDTO;
+
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -31,4 +33,6 @@ public class RecipeDTO {
 
     @PositiveOrZero(message = "Servings must be a positive number")
     private Integer servings; // number of servings
+
+    private CategoryDTO category;
 }
