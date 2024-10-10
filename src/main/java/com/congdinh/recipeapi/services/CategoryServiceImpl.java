@@ -168,7 +168,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         // Checl if category name is existed
         var existedCategory = categoryRepository.findByName(categoryDTO.getName());
-        if (existedCategory != null) {
+        if (existedCategory != null && !existedCategory.getId().equals(id)) {
             throw new IllegalArgumentException("Category name is existed");
         }
 

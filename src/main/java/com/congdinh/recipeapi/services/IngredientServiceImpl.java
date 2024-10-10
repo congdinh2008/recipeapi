@@ -144,7 +144,7 @@ public class IngredientServiceImpl implements IngredientService {
 
         // Checl if ingredient name is existed
         var existedIngredient = ingredientRepository.findByName(ingredientDTO.getName());
-        if (existedIngredient != null) {
+        if (existedIngredient != null && !existedIngredient.getId().equals(id)) {
             throw new IllegalArgumentException("Ingredient name is existed");
         }
 
