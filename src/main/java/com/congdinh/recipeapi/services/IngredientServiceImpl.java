@@ -12,6 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.congdinh.recipeapi.dto.ingredient.IngredientCreateBatchDTO;
 import com.congdinh.recipeapi.dto.ingredient.IngredientCreateDTO;
 import com.congdinh.recipeapi.dto.ingredient.IngredientDTO;
 
@@ -134,6 +135,39 @@ public class IngredientServiceImpl implements IngredientService {
         newIngredientDTO.setName(ingredient.getName());
 
         return newIngredientDTO;
+    }
+
+    @Override
+    public List<IngredientDTO> create(IngredientCreateBatchDTO ingredientCreateBatchDTO) {
+        // ingredients is required
+        if (ingredientCreateBatchDTO == null) {
+            throw new IllegalArgumentException("Ingredients is required");
+        }
+
+        // List of ingredients is required
+        if (ingredientCreateBatchDTO.getIngredients() == null || ingredientCreateBatchDTO.getIngredients().isEmpty()) {
+            throw new IllegalArgumentException("Ingredients is required");
+        }
+
+        // Convert List<IngredientCreateDTO> to List<Ingredient>
+        var ingredients = ingredientCreateBatchDTO.getIngredients().stream().map(ingredientCreateDTO -> {
+            var ingredient = new Ingredient();
+            ingredient.setName(ingredientCreateDTO.getName());
+            return ingredient;
+        }).toList();
+
+        // Save all ingredients
+        var result = ingredientRepository.saveAll(ingredients);
+
+        // Convert List<Ingredient> to List<IngredientDTO>
+        var ingredientDTOs = result.stream().map(ingredient -> {
+            var ingredientDTO = new IngredientDTO();
+            ingredientDTO.setId(ingredient.getId());
+            ingredientDTO.setName(ingredient.getName());
+            return ingredientDTO;
+        }).toList();
+
+        return ingredientDTOs;
     }
 
     @Override

@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.congdinh.recipeapi.dto.ingredient.IngredientCreateBatchDTO;
 import com.congdinh.recipeapi.dto.ingredient.IngredientCreateDTO;
 import com.congdinh.recipeapi.dto.ingredient.IngredientDTO;
 
@@ -19,6 +20,8 @@ public interface IngredientService {
     IngredientDTO findById(UUID id);
 
     IngredientDTO create(IngredientCreateDTO ingredientCreateDTO);
+
+    List<IngredientDTO> create(IngredientCreateBatchDTO ingredientCreateBatchDTO);
 
     IngredientDTO update(UUID id, IngredientDTO ingredientDTO);
 

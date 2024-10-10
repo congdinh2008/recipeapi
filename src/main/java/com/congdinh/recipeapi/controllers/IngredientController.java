@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import com.congdinh.recipeapi.dto.ingredient.IngredientCreateBatchDTO;
 import com.congdinh.recipeapi.dto.ingredient.IngredientCreateDTO;
 import com.congdinh.recipeapi.dto.ingredient.IngredientDTO;
 import com.congdinh.recipeapi.services.IngredientService;
@@ -92,6 +93,29 @@ public class IngredientController {
 
         // Check if newIngredient is null => return 400 Bad Request
         if (newIngredient == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // Check if newIngredient is not null => return 201 Created with newIngredient
+        return ResponseEntity.status(201).body(newIngredient);
+    }
+
+    // Create Batch - PostMapping - /api/v1/ingredients/create-batch
+    @PostMapping("/create-batch")
+    @Operation(summary = "Create batch of ingredients")
+    @ApiResponse(responseCode = "201", description = "Create batch of ingredients")
+    @ApiResponse(responseCode = "400", description = "Bad Request")
+    public ResponseEntity<?> createBatch(@Valid @RequestBody IngredientCreateBatchDTO ingredientCreateBatchDTO,
+            BindingResult bindingResult) {
+        // Validate ingredientCreateDTO
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+
+        var newIngredient = ingredientService.create(ingredientCreateBatchDTO);
+
+        // Check if newIngredient is null => return 400 Bad Request
+        if (newIngredient == null || newIngredient.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
 
