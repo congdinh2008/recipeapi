@@ -6,7 +6,11 @@ import java.util.UUID;
 import jakarta.persistence.criteria.Predicate;
 
 import com.congdinh.recipeapi.entities.Recipe;
+import com.congdinh.recipeapi.entities.RecipeIngredient;
+import com.congdinh.recipeapi.entities.RecipeIngredientId;
 import com.congdinh.recipeapi.repositories.CategoryRepository;
+import com.congdinh.recipeapi.repositories.IngredientRepository;
+import com.congdinh.recipeapi.repositories.RecipeIngredientRepository;
 import com.congdinh.recipeapi.repositories.RecipeRepository;
 
 import org.springframework.data.domain.Page;
@@ -16,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.congdinh.recipeapi.dto.category.CategoryDTO;
+import com.congdinh.recipeapi.dto.ingredient.IngredientDTO;
+import com.congdinh.recipeapi.dto.recipe.RecipeAddIngredientDTO;
 import com.congdinh.recipeapi.dto.recipe.RecipeCreateDTO;
 import com.congdinh.recipeapi.dto.recipe.RecipeDTO;
 import com.congdinh.recipeapi.dto.recipe.RecipeEditDTO;
@@ -25,11 +31,17 @@ import com.congdinh.recipeapi.dto.recipe.RecipeEditDTO;
 public class RecipeServiceImpl implements RecipeService {
     private final RecipeRepository recipeRepository;
     private final CategoryRepository categoryRepository;
+    private final IngredientRepository ingredientRepository;
+    private final RecipeIngredientRepository recipeIngredientRepository;
 
     // Inject RecipeRepository via constructor
-    public RecipeServiceImpl(RecipeRepository recipeRepository, CategoryRepository categoryRepository) {
+    public RecipeServiceImpl(RecipeRepository recipeRepository, CategoryRepository categoryRepository,
+            RecipeIngredientRepository recipeIngredientRepository,
+            IngredientRepository ingredientRepository) {
         this.recipeRepository = recipeRepository;
         this.categoryRepository = categoryRepository;
+        this.ingredientRepository = ingredientRepository;
+        this.recipeIngredientRepository = recipeIngredientRepository;
     }
 
     @Override
@@ -198,6 +210,21 @@ public class RecipeServiceImpl implements RecipeService {
             recipeDTO.setCategory(categoryDTO);
         }
 
+        // Check if entity recipe has ingredients
+        if (recipe.getIngredients() != null) {
+            // Convert Set<RecipeIngredient> to List<RecipeIngredientDTO>
+            var ingredientDTOs = recipe.getIngredients().stream().map(recipeIngredient -> {
+                var ingredientDTO = new IngredientDTO();
+                ingredientDTO.setId(recipeIngredient.getIngredient().getId());
+                ingredientDTO.setName(recipeIngredient.getIngredient().getName());
+
+                return ingredientDTO;
+            }).toList();
+
+            // Set recipeIngredientDTOs to recipeDTO
+            recipeDTO.setIngredients(ingredientDTOs);
+        }
+
         return recipeDTO;
     }
 
@@ -344,5 +371,41 @@ public class RecipeServiceImpl implements RecipeService {
 
         // Check if recipe is deleted
         return !recipeRepository.existsById(id);
+    }
+
+    @Override
+    public boolean addIngredient(UUID id, UUID ingredientId, RecipeAddIngredientDTO recipeAddIngredientDTO) {
+        // Check if recipe is existed
+        var recipe = recipeRepository.findById(id).orElse(null);
+
+        if (recipe == null) {
+            throw new IllegalArgumentException("Recipe not found");
+        }
+
+        // Check ingredientId is existed
+        var ingredient = ingredientRepository.findById(ingredientId).orElse(null);
+
+        if (ingredient == null) {
+            throw new IllegalArgumentException("Ingredient not found");
+        }
+
+        // Check amount not null or empty
+        if (recipeAddIngredientDTO.getAmount() == null || recipeAddIngredientDTO.getAmount().isBlank()) {
+            throw new IllegalArgumentException("Amount is required");
+        }
+
+        var recipeIngredientId = new RecipeIngredientId(recipe.getId(), ingredient.getId());
+
+        // Create RecipeIngredient entity
+        var recipeIngredient = new RecipeIngredient();
+        recipeIngredient.setId(recipeIngredientId);
+        recipeIngredient.setRecipe(recipe);
+        recipeIngredient.setIngredient(ingredient);
+        recipeIngredient.setAmount(recipeAddIngredientDTO.getAmount());
+
+        // Save RecipeIngredient
+        var recipeIngredientSaved = recipeIngredientRepository.save(recipeIngredient);
+
+        return recipeIngredientSaved != null;
     }
 }

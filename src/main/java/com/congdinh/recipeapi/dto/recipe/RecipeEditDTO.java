@@ -32,4 +32,6 @@ public class RecipeEditDTO {
     private Integer servings; // number of servings
 
     private UUID categoryId;
+
+    // private List<RecipeAddIngredientDTO> ingredients;
 }

@@ -1,10 +1,11 @@
 package com.congdinh.recipeapi.dto.recipe;
 
-import java.util.UUID;
+import java.util.*;
 
 import org.hibernate.validator.constraints.Length;
 
 import com.congdinh.recipeapi.dto.category.CategoryDTO;
+import com.congdinh.recipeapi.dto.ingredient.IngredientDTO;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -35,4 +36,6 @@ public class RecipeDTO {
     private Integer servings; // number of servings
 
     private CategoryDTO category;
+
+    private List<IngredientDTO> ingredients;
 }

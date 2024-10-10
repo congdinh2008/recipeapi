@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import com.congdinh.recipeapi.dto.recipe.RecipeAddIngredientDTO;
 import com.congdinh.recipeapi.dto.recipe.RecipeCreateDTO;
 import com.congdinh.recipeapi.dto.recipe.RecipeDTO;
 import com.congdinh.recipeapi.dto.recipe.RecipeEditDTO;
@@ -142,5 +143,27 @@ public class RecipeController {
         var isDeleted = recipeService.delete(id);
 
         return ResponseEntity.ok(isDeleted);
+    }
+
+    // Add ingredient to recipe - PostMapping -
+    // /api/v1/recipes/{id}/ingredients/{ingredientId}
+    @PostMapping("/{id}/ingredients/{ingredientId}")
+    @Operation(summary = "Add ingredient to recipe by id")
+    @ApiResponse(responseCode = "200", description = "Add ingredient to recipe by id")
+    @ApiResponse(responseCode = "404", description = "Recipe or ingredient not found")
+    public ResponseEntity<?> addIngredient(
+            @PathVariable UUID id,
+            @PathVariable UUID ingredientId,
+            @Valid @RequestBody RecipeAddIngredientDTO recipeAddIngredientDTO,
+            BindingResult bindingResult) {
+
+        // Validate recipeAddIngredientDTO
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+
+        var result = recipeService.addIngredient(id, ingredientId, recipeAddIngredientDTO);
+
+        return ResponseEntity.ok(result);
     }
 }
