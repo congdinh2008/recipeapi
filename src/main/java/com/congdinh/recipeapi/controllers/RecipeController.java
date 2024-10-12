@@ -9,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import com.congdinh.recipeapi.dto.recipe.RecipeAddIngredientDTO;
+import com.congdinh.recipeapi.dto.recipe.RecipeAddListIngredientDTO;
 import com.congdinh.recipeapi.dto.recipe.RecipeCreateDTO;
 import com.congdinh.recipeapi.dto.recipe.RecipeDTO;
 import com.congdinh.recipeapi.dto.recipe.RecipeEditDTO;
@@ -147,13 +148,12 @@ public class RecipeController {
 
     // Add ingredient to recipe - PostMapping -
     // /api/v1/recipes/{id}/ingredients/{ingredientId}
-    @PostMapping("/{id}/ingredients/{ingredientId}")
+    @PostMapping("/{id}/ingredients")
     @Operation(summary = "Add ingredient to recipe by id")
     @ApiResponse(responseCode = "200", description = "Add ingredient to recipe by id")
     @ApiResponse(responseCode = "404", description = "Recipe or ingredient not found")
     public ResponseEntity<?> addIngredient(
             @PathVariable UUID id,
-            @PathVariable UUID ingredientId,
             @Valid @RequestBody RecipeAddIngredientDTO recipeAddIngredientDTO,
             BindingResult bindingResult) {
 
@@ -162,7 +162,28 @@ public class RecipeController {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
 
-        var result = recipeService.addIngredient(id, ingredientId, recipeAddIngredientDTO);
+        var result = recipeService.addIngredient(id, recipeAddIngredientDTO);
+
+        return ResponseEntity.ok(result);
+    }
+
+    // Add ingredient to recipe - PostMapping -
+    // /api/v1/recipes/{id}/ingredients/{ingredientId}
+    @PostMapping("/{id}/ingredients/add-batch")
+    @Operation(summary = "Add ingredient to recipe by id")
+    @ApiResponse(responseCode = "200", description = "Add ingredient to recipe by id")
+    @ApiResponse(responseCode = "404", description = "Recipe or ingredient not found")
+    public ResponseEntity<?> addIngredient(
+            @PathVariable UUID id,
+            @Valid @RequestBody RecipeAddListIngredientDTO recipeAddListIngredientDTO,
+            BindingResult bindingResult) {
+
+        // Validate recipeAddIngredientDTO
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+
+        var result = recipeService.addIngredient(id, recipeAddListIngredientDTO);
 
         return ResponseEntity.ok(result);
     }

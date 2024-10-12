@@ -1,5 +1,6 @@
 package com.congdinh.recipeapi.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,9 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.congdinh.recipeapi.dto.category.CategoryDTO;
 import com.congdinh.recipeapi.dto.ingredient.IngredientDTO;
 import com.congdinh.recipeapi.dto.recipe.RecipeAddIngredientDTO;
+import com.congdinh.recipeapi.dto.recipe.RecipeAddListIngredientDTO;
 import com.congdinh.recipeapi.dto.recipe.RecipeCreateDTO;
 import com.congdinh.recipeapi.dto.recipe.RecipeDTO;
 import com.congdinh.recipeapi.dto.recipe.RecipeEditDTO;
+import com.congdinh.recipeapi.dto.recipe.RecipeIngredientDTO;
+import com.congdinh.recipeapi.dto.recipe.RecipeIngredientWithRecipeIdDTO;
 
 @Service
 @Transactional
@@ -374,7 +378,7 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    public boolean addIngredient(UUID id, UUID ingredientId, RecipeAddIngredientDTO recipeAddIngredientDTO) {
+    public boolean addIngredient(UUID id, RecipeAddIngredientDTO recipeAddIngredientDTO) {
         // Check if recipe is existed
         var recipe = recipeRepository.findById(id).orElse(null);
 
@@ -383,7 +387,7 @@ public class RecipeServiceImpl implements RecipeService {
         }
 
         // Check ingredientId is existed
-        var ingredient = ingredientRepository.findById(ingredientId).orElse(null);
+        var ingredient = ingredientRepository.findById(recipeAddIngredientDTO.getIngredientId()).orElse(null);
 
         if (ingredient == null) {
             throw new IllegalArgumentException("Ingredient not found");
@@ -407,5 +411,60 @@ public class RecipeServiceImpl implements RecipeService {
         var recipeIngredientSaved = recipeIngredientRepository.save(recipeIngredient);
 
         return recipeIngredientSaved != null;
+    }
+
+    @Override
+    public RecipeIngredientWithRecipeIdDTO addIngredient(UUID id,
+            RecipeAddListIngredientDTO recipeAddListIngredientDTO) {
+        // Check if recipe is existed
+        var recipe = recipeRepository.findById(id).orElse(null);
+
+        if (recipe == null) {
+            throw new IllegalArgumentException("Recipe not found");
+        }
+
+        var result = new RecipeIngredientWithRecipeIdDTO();
+        result.setRecipeId(id);
+
+        var listIngredientAdded = new ArrayList<RecipeIngredientDTO>();
+
+        recipeAddListIngredientDTO.getIngredients().stream().forEach(recipeAddIngredientDTO -> {
+            // Check ingredientId is existed
+            var ingredient = ingredientRepository.findById(recipeAddIngredientDTO.getIngredientId()).orElse(null);
+
+            if (ingredient == null) {
+                throw new IllegalArgumentException("Ingredient not found");
+            }
+
+            // Check amount not null or empty
+            if (recipeAddIngredientDTO.getAmount() == null || recipeAddIngredientDTO.getAmount().isBlank()) {
+                throw new IllegalArgumentException("Amount is required");
+            }
+
+            var recipeIngredientId = new RecipeIngredientId(recipe.getId(), ingredient.getId());
+
+            // Create RecipeIngredient entity
+            var recipeIngredient = new RecipeIngredient();
+            recipeIngredient.setId(recipeIngredientId);
+            recipeIngredient.setRecipe(recipe);
+            recipeIngredient.setIngredient(ingredient);
+            recipeIngredient.setAmount(recipeAddIngredientDTO.getAmount());
+
+            // Save RecipeIngredient
+            var recipeIngredientSaved = recipeIngredientRepository.save(recipeIngredient);
+
+            // Convert recipeIngredientSaved to RecipeIngredientDTO
+            var recipeIngredientDTO = new RecipeIngredientDTO();
+            recipeIngredientDTO.setIngredientId(recipeIngredientSaved.getIngredient().getId());
+            recipeIngredientDTO.setName(recipeIngredientSaved.getIngredient().getName());
+            recipeIngredientDTO.setAmount(recipeIngredientSaved.getAmount());
+
+            // Add recipeIngredientDTO to list of result
+            listIngredientAdded.add(recipeIngredientDTO);
+
+        });
+        result.setIngredients(listIngredientAdded);
+
+        return result;
     }
 }
