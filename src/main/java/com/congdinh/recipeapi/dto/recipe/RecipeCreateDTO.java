@@ -1,6 +1,8 @@
 package com.congdinh.recipeapi.dto.recipe;
 
 import org.hibernate.validator.constraints.Length;
+
+import java.util.List;
 import java.util.UUID;
 
 import jakarta.validation.constraints.*;
@@ -31,5 +33,5 @@ public class RecipeCreateDTO {
 
     private UUID categoryId;
 
-    // private List<RecipeAddIngredientDTO> ingredients;
+    private List<RecipeAddIngredientDTO> ingredients;
 }
