@@ -186,6 +186,71 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    public Page<RecipeDTO> findAll(String keyword, String categoryName, Pageable pageable) {
+        // Find recipe by keyword
+        Specification<Recipe> specification = (root, query, criteriaBuilder) -> {
+            // Neu keyword null thi tra ve null
+            if (keyword == null) {
+                return null;
+            }
+
+            // Neu keyword khong null
+            // WHERE LOWER(name) LIKE %keyword%
+            Predicate titlePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("title")),
+                    "%" + keyword.toLowerCase() + "%");
+
+            // WHERE LOWER(description) LIKE %keyword%
+            Predicate desPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("description")),
+                    "%" + keyword.toLowerCase() + "%");
+
+            Predicate keywordPredicate = criteriaBuilder.or(titlePredicate, desPredicate);
+
+            // Neu categoryName null thi tra ve keywordPredicate
+            if (categoryName == null) {
+                return keywordPredicate;
+            }
+
+            // Neu categoryName khong null tao predicate categoryPredicate
+            // WHERE LOWER(category.name) = categoryName
+            Predicate categoryPredicate = criteriaBuilder.equal(criteriaBuilder.lower(root.get("category").get("name")),
+                    categoryName.toLowerCase());
+
+            // Tra ve keywordPredicate AND categoryPredicate
+            return criteriaBuilder.and(keywordPredicate, categoryPredicate);
+        };
+
+        var recipes = recipeRepository.findAll(specification, pageable);
+
+        // Covert Page<Recipe> to Page<RecipeDTO>
+        var recipeDTOs = recipes.map(recipe -> {
+            var recipeDTO = new RecipeDTO();
+            recipeDTO.setId(recipe.getId());
+            recipeDTO.setTitle(recipe.getTitle());
+            recipeDTO.setDescription(recipe.getDescription());
+            recipeDTO.setImage(recipe.getImage());
+            recipeDTO.setPrepTime(recipe.getPrepTime());
+            recipeDTO.setCookTime(recipe.getCookTime());
+            recipeDTO.setServings(recipe.getServings());
+
+            // Check if entity recipe has category
+            if (recipe.getCategory() != null) {
+                // Convert Category to CategoryDTO
+                var categoryDTO = new CategoryDTO();
+                categoryDTO.setId(recipe.getCategory().getId());
+                categoryDTO.setName(recipe.getCategory().getName());
+                categoryDTO.setDescription(recipe.getCategory().getDescription());
+
+                // Set categoryDTO to recipeDTO
+                recipeDTO.setCategory(categoryDTO);
+            }
+
+            return recipeDTO;
+        });
+
+        return recipeDTOs;
+    }
+
+    @Override
     public RecipeDTO findById(UUID id) {
         var recipe = recipeRepository.findById(id).orElse(null);
 

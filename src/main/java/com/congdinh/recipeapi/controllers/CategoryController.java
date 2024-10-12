@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.congdinh.recipeapi.dto.category.CategoryCreateDTO;
 import com.congdinh.recipeapi.dto.category.CategoryDTO;
+import com.congdinh.recipeapi.dto.category.CategorySearchDTO;
+import com.congdinh.recipeapi.dtos.core.SortDirection;
 import com.congdinh.recipeapi.services.CategoryService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,6 +54,33 @@ public class CategoryController {
 
         // Search category by keyword and paging
         var categories = categoryService.findAll(keyword, pageable);
+
+        // Convert to PagedModel - Enhance data with HATEOAS - Easy to navigate with
+        // links
+        var pagedModel = pagedResourcesAssembler.toModel(categories);
+
+        return ResponseEntity.ok(pagedModel);
+    }
+
+    // Get all - GetMapping - /api/v1/categories
+    // Search - GetMapping - /api/v1/categories?keyword=...&page=...&size=...
+    @PostMapping("/search")
+    @Operation(summary = "Get all categories or search categories by keyword")
+    @ApiResponse(responseCode = "200", description = "Return all categories or search categories by keyword")
+    public ResponseEntity<?> search(@RequestBody CategorySearchDTO categorySearchDTO) {
+        // Check sort order
+        Pageable pageable = null;
+
+        if (categorySearchDTO.getOrder().equals(SortDirection.ASC)) {
+            pageable = PageRequest.of(categorySearchDTO.getPage(), categorySearchDTO.getSize(),
+                    Sort.by(categorySearchDTO.getSortBy()).ascending());
+        } else {
+            pageable = PageRequest.of(categorySearchDTO.getPage(), categorySearchDTO.getSize(),
+                    Sort.by(categorySearchDTO.getSortBy()).descending());
+        }
+
+        // Search category by keyword and paging
+        var categories = categoryService.findAll(categorySearchDTO.getKeyword(), pageable);
 
         // Convert to PagedModel - Enhance data with HATEOAS - Easy to navigate with
         // links

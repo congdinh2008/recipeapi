@@ -20,6 +20,8 @@ public interface RecipeService {
 
     Page<RecipeDTO> findAll(String keyword, Pageable pageable);
 
+    Page<RecipeDTO> findAll(String keyword, String categoryName, Pageable pageable);
+
     RecipeDTO findById(UUID id);
 
     RecipeDTO create(RecipeCreateDTO recipeCreateDTO);

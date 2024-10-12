@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import com.congdinh.recipeapi.dto.ingredient.IngredientCreateBatchDTO;
 import com.congdinh.recipeapi.dto.ingredient.IngredientCreateDTO;
 import com.congdinh.recipeapi.dto.ingredient.IngredientDTO;
+import com.congdinh.recipeapi.dto.ingredient.IngredientSearchDTO;
+import com.congdinh.recipeapi.dtos.core.SortDirection;
 import com.congdinh.recipeapi.services.IngredientService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,6 +55,33 @@ public class IngredientController {
 
         // Search ingredient by keyword and paging
         var ingredients = ingredientService.findAll(keyword, pageable);
+
+        // Convert to PagedModel - Enhance data with HATEOAS - Easy to navigate with
+        // links
+        var pagedModel = pagedResourcesAssembler.toModel(ingredients);
+
+        return ResponseEntity.ok(pagedModel);
+    }
+
+    // Get all - GetMapping - /api/v1/ingredients
+    // Search - GetMapping - /api/v1/ingredients?keyword=...&page=...&size=...
+    @PostMapping("/search")
+    @Operation(summary = "Get all ingredients or search ingredients by keyword")
+    @ApiResponse(responseCode = "200", description = "Return all ingredients or search ingredients by keyword")
+    public ResponseEntity<?> search(@RequestBody IngredientSearchDTO ingredientSearchDTO) {
+        // Check sort order
+        Pageable pageable = null;
+
+        if (ingredientSearchDTO.getOrder().equals(SortDirection.ASC)) {
+            pageable = PageRequest.of(ingredientSearchDTO.getPage(), ingredientSearchDTO.getSize(),
+                    Sort.by(ingredientSearchDTO.getSortBy()).ascending());
+        } else {
+            pageable = PageRequest.of(ingredientSearchDTO.getPage(), ingredientSearchDTO.getSize(),
+                    Sort.by(ingredientSearchDTO.getSortBy()).descending());
+        }
+
+        // Search ingredient by keyword and paging
+        var ingredients = ingredientService.findAll(ingredientSearchDTO.getKeyword(), pageable);
 
         // Convert to PagedModel - Enhance data with HATEOAS - Easy to navigate with
         // links

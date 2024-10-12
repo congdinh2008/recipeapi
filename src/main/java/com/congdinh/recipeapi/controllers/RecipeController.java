@@ -8,11 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import com.congdinh.recipeapi.dto.recipe.RecipeAddIngredientDTO;
-import com.congdinh.recipeapi.dto.recipe.RecipeAddListIngredientDTO;
-import com.congdinh.recipeapi.dto.recipe.RecipeCreateDTO;
-import com.congdinh.recipeapi.dto.recipe.RecipeDTO;
-import com.congdinh.recipeapi.dto.recipe.RecipeEditDTO;
+import com.congdinh.recipeapi.dto.recipe.*;
+import com.congdinh.recipeapi.dtos.core.SortDirection;
 import com.congdinh.recipeapi.services.RecipeService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,6 +52,33 @@ public class RecipeController {
 
         // Search recipe by keyword and paging
         var recipes = recipeService.findAll(keyword, pageable);
+
+        // Convert to PagedModel - Enhance data with HATEOAS - Easy to navigate with
+        // links
+        var pagedModel = pagedResourcesAssembler.toModel(recipes);
+
+        return ResponseEntity.ok(pagedModel);
+    }
+
+    // Get all - GetMapping - /api/v1/recipes
+    // Search - GetMapping - /api/v1/recipes?keyword=...&page=...&size=...
+    @PostMapping("/search")
+    @Operation(summary = "Get all recipes or search recipes by keyword")
+    @ApiResponse(responseCode = "200", description = "Return all recipes or search recipes by keyword")
+    public ResponseEntity<?> search(@RequestBody RecipeSearchDTO recipeSearchDTO) {
+        // Check sort order
+        Pageable pageable = null;
+
+        if (recipeSearchDTO.getOrder().equals(SortDirection.ASC)) {
+            pageable = PageRequest.of(recipeSearchDTO.getPage(), recipeSearchDTO.getSize(),
+                    Sort.by(recipeSearchDTO.getSortBy()).ascending());
+        } else {
+            pageable = PageRequest.of(recipeSearchDTO.getPage(), recipeSearchDTO.getSize(),
+                    Sort.by(recipeSearchDTO.getSortBy()).descending());
+        }
+
+        // Search recipe by keyword and paging
+        var recipes = recipeService.findAll(recipeSearchDTO.getKeyword(), recipeSearchDTO.getCategoryName(), pageable);
 
         // Convert to PagedModel - Enhance data with HATEOAS - Easy to navigate with
         // links
