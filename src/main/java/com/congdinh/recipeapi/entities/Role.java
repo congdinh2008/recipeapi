@@ -1,5 +1,6 @@
 package com.congdinh.recipeapi.entities;
 
+import java.util.Set;
 import java.util.UUID;
 
 import jakarta.persistence.*;
@@ -21,4 +22,7 @@ public class Role {
 
     @Column(name = "description", columnDefinition = "NVARCHAR(500)")
     private String description;
+
+    @ManyToMany(mappedBy = "roles")
+    private Set<User> users;
 }
