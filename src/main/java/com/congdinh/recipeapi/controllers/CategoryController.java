@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import com.congdinh.recipeapi.dto.category.CategoryCreateDTO;
 import com.congdinh.recipeapi.dto.category.CategoryDTO;
 import com.congdinh.recipeapi.dto.category.CategorySearchDTO;
-import com.congdinh.recipeapi.dtos.core.SortDirection;
+import com.congdinh.recipeapi.dto.core.SortDirection;
 import com.congdinh.recipeapi.services.CategoryService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -160,12 +160,6 @@ public class CategoryController {
     @ApiResponse(responseCode = "200", description = "Delete category by id")
     @ApiResponse(responseCode = "404", description = "Category not found")
     public ResponseEntity<?> deleteById(@PathVariable UUID id) {
-        var existedCategory = categoryService.findById(id);
-        // Check if category is null => return 404 Not Found
-        if (existedCategory == null) {
-            return ResponseEntity.notFound().build();
-        }
-
         // Check if category is not null => delete category
         var isDeleted = categoryService.delete(id);
 

@@ -8,10 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import com.congdinh.recipeapi.dto.core.SortDirection;
 import com.congdinh.recipeapi.dto.role.RoleCreateDTO;
 import com.congdinh.recipeapi.dto.role.RoleDTO;
 import com.congdinh.recipeapi.dto.role.RoleSearchDTO;
-import com.congdinh.recipeapi.dtos.core.SortDirection;
 import com.congdinh.recipeapi.services.RoleService;
 
 import io.swagger.v3.oas.annotations.Operation;

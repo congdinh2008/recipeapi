@@ -1,6 +1,7 @@
 package com.congdinh.recipeapi.dto.ingredient;
 
-import com.congdinh.recipeapi.dtos.core.SearchDTO;
+import com.congdinh.recipeapi.dto.core.SearchDTO;
+
 import lombok.*;
 
 @Getter

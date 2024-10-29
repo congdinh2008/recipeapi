@@ -8,11 +8,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import com.congdinh.recipeapi.dto.core.SortDirection;
 import com.congdinh.recipeapi.dto.ingredient.IngredientCreateBatchDTO;
 import com.congdinh.recipeapi.dto.ingredient.IngredientCreateDTO;
 import com.congdinh.recipeapi.dto.ingredient.IngredientDTO;
 import com.congdinh.recipeapi.dto.ingredient.IngredientSearchDTO;
-import com.congdinh.recipeapi.dtos.core.SortDirection;
 import com.congdinh.recipeapi.services.IngredientService;
 
 import io.swagger.v3.oas.annotations.Operation;

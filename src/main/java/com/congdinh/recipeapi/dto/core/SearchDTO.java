@@ -1,4 +1,4 @@
-package com.congdinh.recipeapi.dtos.core;
+package com.congdinh.recipeapi.dto.core;
 
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;

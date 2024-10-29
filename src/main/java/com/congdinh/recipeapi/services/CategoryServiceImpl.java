@@ -6,6 +6,7 @@ import java.util.UUID;
 import jakarta.persistence.criteria.Predicate;
 
 import com.congdinh.recipeapi.entities.Category;
+import com.congdinh.recipeapi.exceptions.ResourceNotFoundException;
 import com.congdinh.recipeapi.repositories.CategoryRepository;
 
 import org.springframework.data.domain.Page;
@@ -201,7 +202,7 @@ public class CategoryServiceImpl implements CategoryService {
         var category = categoryRepository.findById(id).orElse(null);
 
         if (category == null) {
-            throw new IllegalArgumentException("Category not found");
+            throw new ResourceNotFoundException("Category not found");
         }
 
         // Delete category
